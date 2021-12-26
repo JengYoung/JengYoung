@@ -1,0 +1,31 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
+  },
+  "extends": [
+    "eslint:recommended", 
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
+    "no-unused-vars": "warn",
+    "semi": "warn"
+  },
+  "plugins": ["prettier"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "settings": {
+    "import/resolver" : {
+      "alias" : {
+        "map" : [
+          ["@","./src/"]
+        ],
+        "extensions": [".js"]
+      }
+    }
+  }
+}
