@@ -83,8 +83,21 @@ const runner = Runner.create();
 // Run the engine
 Runner.run(runner, engine);
 
-setInterval(() => {
+let clearId = setInterval(() => {
   const resultBodies = makeResultBodies();
 
   Composite.add(engine.world, [...resultBodies]);
-}, 15000);
+}, 5000);
+
+document.addEventListener('visibilitychange', function() {
+  if(document.hidden) {
+    clearInterval(clearId)
+  }
+  else {
+    clearId = setInterval(() => {
+      const resultBodies = makeResultBodies();
+    
+      Composite.add(engine.world, [...resultBodies]);
+    }, 5000);
+  }
+});
