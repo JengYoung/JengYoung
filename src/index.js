@@ -1,16 +1,11 @@
 import Matter from 'matter-js';
 // module aliases
-const Engine = Matter.Engine;
-const Render = Matter.Render;
-const Runner = Matter.Runner;
-const Bodies = Matter.Bodies;
-const World = Matter.World;
-const Composite = Matter.Composite;
-const Vertices = Matter.Vertices;
+const { Engine, Render, Runner, Bodies, World, Composite, Vertices } = Matter;
 
 const font = [];
-const letters = document.getElementById('jengyoung')?.querySelectorAll('path');
-letters.forEach(path => {
+document
+  .getElementById('jengyoung')?.querySelectorAll('path')
+  .forEach(path => {
   font.push(Matter.Svg.pathToVertices(path));
 });
 
@@ -28,7 +23,7 @@ World.add(
   }),
 );
 
-// create a renderer
+// Renderer
 const render = Render.create({
   element: document.body,
   engine,
@@ -40,61 +35,56 @@ const render = Render.create({
   },
 });
 
+// Bodies
+const { circle, fromVertices } = Bodies;
+
 const star = Vertices.fromPath(
   '50 0 63 38 100 38 69 59 82 100 50 75 18 100 31 59 0 38 37 38',
 );
 
-Matter.Vertices.scale(star, -0.1875, -0.1875);
-const circles = [];
-// create two boxes and a ground
-for (let i = 0; i < 100; i += 1) {
-  circles.push(
-    Bodies.circle(10 + i * 10, 500 + Math.random(100) * 2500, 4, {
-      render: { fillStyle: '#F9C2EA', lineWidth: 1, strokeStyle: '#F9C2EA' },
-    }),
-    Bodies.circle(10 + i * 10, 500 + Math.random(100) * 2500, 4, {
-      render: { fillStyle: '#F16FCE', lineWidth: 1, strokeStyle: '#F16FCE' },
-    }),
-    Bodies.circle(10 + i * 10, 500 + Math.random(100) * 2500, 4, {
-      render: { fillStyle: '#F9C2EA', lineWidth: 1, strokeStyle: '#F9C2EA' },
-    }),
-    Bodies.circle(10 + i * 10, 500 + Math.random(100) * 2500, 4, {
-      render: { fillStyle: '#F16FCE', lineWidth: 1, strokeStyle: '#F16FCE' },
-    }),
-    Bodies.circle(10 + i * 10, 500 + Math.random(100) * 2500, 4, {
-      render: { fillStyle: '#B620BE', lineWidth: 1, strokeStyle: '#B620BE' },
-    }),
-    Bodies.fromVertices(10 + i * 10, 500 + Math.random(100) * 2500, star, {
-      render: { fillStyle: '#fee433', lineWidth: 1, strokeStyle: '#fee433' },
-    }),
-  );
+Vertices.scale(star, -0.1875, -0.1875);
+
+const renderBodiesFigure = (x, cb, colors, verticesPath) => {
+  if (typeof colors === 'string') {
+    return cb(10 + x * 10, 500 + Math.random(100) * 2500, verticesPath || 4, {
+      render: { fillStyle: colors, lineWidth: 1, strokeStyle: colors },
+    })
+  }
+  console.warn('invalid params')
+  return;
 }
 
-// add all of the bodies to the world
-Composite.add(engine.world, [...circles]);
-// run the renderer
+const makeResultBodies = () => {
+  const resultBodies = [];
+  for (let i = 0; i < 100; i += 1) {
+    resultBodies.push(
+      renderBodiesFigure(i, circle, '#F9C2EA'),
+      renderBodiesFigure(i, circle, '#F9C2EA'),
+      renderBodiesFigure(i, circle, '#F16FCE'),
+      renderBodiesFigure(i, circle, '#F16FCE'),
+      renderBodiesFigure(i, circle, '#B620BE'),
+      renderBodiesFigure(i, fromVertices, '#fee433', star),
+    );
+  }
+  return resultBodies;
+}
+
+const resultBodies = makeResultBodies();
+
+// Composite
+Composite.add(engine.world, [...resultBodies]);
+
+// Run renderer
 Render.run(render);
 
-// create runner
+// Create runner
 const runner = Runner.create();
 
-// run the engine
+// Run the engine
 Runner.run(runner, engine);
 
-// setInterval(() => {
-//   const circles = [];
-//   for (let i = 0; i < 100; i += 1) {
-//     circles.push(
-//       Bodies.fromVertices(10 + i * 10, 500 + Math.random(100) * 5000, star, {
-//         render: { fillStyle: '#fee433', lineWidth: 1, strokeStyle: '#fee433' },
-//       }),
-//       Bodies.circle(10 + i * 10, 500 + Math.random(100) * 5000, 4, {
-//         render: { fillStyle: '#fee433', lineWidth: 1, strokeStyle: '#fee433' },
-//       }),
-//       Bodies.rectangle(10 + i * 10, 500 + Math.random(100) * 5000, 12, 12, {
-//         render: { fillStyle: '#fee433', lineWidth: 1, strokeStyle: '#fee433' },
-//       }),
-//     );
-//   }
-//   Composite.add(engine.world, [...circles]);
-// }, 15000);
+setInterval(() => {
+  const resultBodies = makeResultBodies();
+
+  Composite.add(engine.world, [...resultBodies]);
+}, 15000);
